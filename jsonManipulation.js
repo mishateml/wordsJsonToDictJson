@@ -1,48 +1,53 @@
-// import the json file
-// import jsonObj from "./jsonManipulation.json"
+// const fs = require('fs');
+const fr = new FileReader();
 
-
-const fs = require('fs');
-const wordsJsonObj = require('./russian-words.json')
-
-// helper functions
-checkArrElementSLength = (arr) => {
-    arr.map((el) => {
-        return el.length
-    })
+download = (content, fileName, contentType) => {
+    var a = document.createElement("a");
+    var file = new Blob([content], {
+        type: contentType
+    });
+    a.href = URL.createObjectURL(file);
+    a.download = fileName;
+    a.click();
 }
 
-// sort the file buy length 
 
-const sortedJson = wordsJsonObj.sort((a, b) => {
-    return a.length - b.length
-});
 
-// cerate new arr and order it by length
+// const wordsJsonObj = require('./russian-words.json');
+let wordsJsonObj;
+const inputElement = document.getElementById("input");
 
-const jsonToArr = JSON.stringify(sortedJson).split(',');
-let newArr = [];
-for (let i = 1; i < 50; i++) {
-    newArr.push([]);
+inputElement.addEventListener("change", handleFiles, false);
+
+function handleFiles() {
+
+    fr.readAsText(this.files[0]);
+    fr.onload = e => {
+
+        wordsJsonObj = JSON.parse(e.target.result);
+        console.log(wordsJsonObj);
+        const obj1 = {};
+        //helpers
+
+
+        for (let i = 0; i < wordsJsonObj.length; i++) {
+            obj1[wordsJsonObj[i].length + ''] = []
+        }
+        for (let i = 0; i < wordsJsonObj.length; i++) {
+            obj1[wordsJsonObj[i].length + ''].push(wordsJsonObj[i])
+        }
+        // console.log(obj1);
+
+
+        download(JSON.stringify(obj1), "newJson.json", "json")
+
+    };
+    // const wordsJsonObj = this.files[0];
+    /* now you can work with the file list */
+
+
+    // write a file to local folder
+    // fs.writeFile("newJson.json", JSON.stringify(obj1), (err) => {
+    //     if (err) console.error(err)
+    // })
 }
-jsonToArr.forEach(el => {
-    newArr[el.length].push(el);
-})
-
-// arr to obj
-
-let obj = newArr.reduce((acc, el) => {
-    acc[el.length] = el;
-    return acc;
-});
-
-console.log(obj);
-
-
-
-
-
-// write a file to local folder
-// fs.writeFile("newJson.json", sortedJson, (err) => {
-//     if (err) console.error(err)
-// })
